@@ -28,3 +28,5 @@ En la carpeta [`/queries/`](./queries/) encontrarás los scripts y consultas est
 - Dominio de sintaxis y comandos de Splunk SPL (`stats count by`, `timechart`, `eval`, `rex`, `where`).
 - Creación de alertas en tiempo real y visualizaciones analíticas.
 - Alineación de telemetría con tácticas y técnicas del marco MITRE ATT&CK.
+
+- ![Dashboard de Monitoreo SOC](assets/dashboard_soc_view.png)
