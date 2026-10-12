@@ -1,0 +1,33 @@
+===================================================================
+PROYECTO: SOC Splunk Lab - Consultas SPL para Detección y Threat Hunting
+===================================================================
+
+--- 1. Detección de Ataques de Fuerza Bruta (EventCode 4625) ---
+index=main EventCode=4625 
+| stats count by IpAddress, TargetUserName, WorkstationName
+| where count > 3
+| sort - count
+
+--- 2. Monitoreo de Inicios de Sesión Exitosos (EventCode 4624) ---
+index=main EventCode=4624 
+| stats count by IpAddress, TargetUserName, WorkstationName
+| sort - count
+
+--- 3. Auditoría de Creación y Habilitación de Cuentas (EventCode 4720/4722) ---
+index=main (EventCode=4720 OR EventCode=4722)
+| stats count by _time, EventCode, TargetUserName, SubjectUserName, IpAddress
+| sort - _time
+
+--- 4. Correlación de Kill Chain: Fuerza Bruta a Persistencia ---
+index=main (EventCode=4625 OR EventCode=4624 OR EventCode=4720)
+| eval Activity=case(
+    EventCode=4625, "1. Fallo de Login", 
+    EventCode=4624, "2. Login Exitoso", 
+    EventCode=4720, "3. Creación de Usuario"
+  )
+| stats count(eval(EventCode=4625)) as Intentos_Fallidos, 
+        values(eval(EventCode=4624)) as Estado_Login, 
+        values(TargetUserName) as Usuarios_Afectados,
+        values(Activity) as Secuencia_Actividad 
+        by IpAddress
+| where Intentos_Fallidos > 0 AND isnotnull(Usuarios_Afectados)
