@@ -1,0 +1,21 @@
+===================================================================
+LABORATORIO SOC - CONSULTAS SPL PARA DETECCIÓN DE AMENAZAS
+===================================================================
+
+--- 1. Detección de Fuerza Bruta (Event Code 4625) ---
+index=main EventCode=4625 
+| stats count by IpAddress, TargetUserName, WorkstationName
+| where count > 3
+| sort - count
+
+
+--- 2. Monitoreo de Creación de Usuarios (Event Code 4720) ---
+index=main EventCode=4720 
+| stats count by _time, EventCode, TargetUserName, SubjectUserName, IpAddress
+| sort - _time
+
+
+--- 3. Detección de Modificación de Grupos Privilegiados (Event Code 4732) ---
+index=main EventCode=4732 
+| stats count by _time, EventCode, TargetUserName, SubjectUserName, GroupName
+| sort - _time
